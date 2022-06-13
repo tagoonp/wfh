@@ -175,8 +175,8 @@ if($stage == 'create_session'){
     $res = $db->fetch($strSQL, false, false);
     if($res){
 
-        echo "a";
-        die();
+        // echo "a";
+        // die();
         $_SESSION['doe_uid'] = $uid; // username
 
         if($res['WFH_ADMIN'] == '1'){

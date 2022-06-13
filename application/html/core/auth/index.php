@@ -6,8 +6,8 @@ require('../../../config/database.php');
 $db = new Database();
 $conn = $db->conn();
 
-echo "id->".$_SESSION['doe_id'];
-die();
+// echo "id->".$_SESSION['doe_id'];
+// die();
 
 if((isset($_SESSION['doe_id'])) && ($_SESSION['doe_id'] == session_id()) && (isset($_SESSION['doe_uid']))){
     $strSQL = "SELECT * FROM wfh_useraccount WHERE USERNAME = '".$_SESSION['doe_uid']."' AND DELETE_STATUS = '0'";

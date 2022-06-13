@@ -6,6 +6,9 @@ require('../../../config/database.php');
 $db = new Database();
 $conn = $db->conn();
 
+echo "id->".$_SESSION['doe_id'];
+die();
+
 if((isset($_SESSION['doe_id'])) && ($_SESSION['doe_id'] == session_id()) && (isset($_SESSION['doe_uid']))){
     $strSQL = "SELECT * FROM wfh_useraccount WHERE USERNAME = '".$_SESSION['doe_uid']."' AND DELETE_STATUS = '0'";
     $res = $db->fetch($strSQL, false, false);
@@ -101,7 +104,7 @@ if((isset($_SESSION['doe_id'])) && ($_SESSION['doe_id'] == session_id()) && (iss
 
                                             <div class="text-center text-sm-left">
                                                 <img src="../../../img/psu-passport.png" class="zoom" alt="" width="100"  onclick="psupassport()" style="cursor: pointer;">
-                                                <img src="../../../img/line.png" alt="" class="zoom" width="100" style="cursor: pointer;" onclick="line()">
+                                                <!-- <img src="../../../img/line.png" alt="" class="zoom" width="100" style="cursor: pointer;" onclick="line()"> -->
                                             </div>
 
                                             <div class="row">

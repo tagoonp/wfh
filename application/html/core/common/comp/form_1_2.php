@@ -101,17 +101,35 @@
                     <label for="">วันที่เริ่ม WFH : <span class="text-danger">*</span></label>
                 </div>
                 <div class="form-group mb-0 col-4">
-                    <select name="" id="" class="form-control">
+                    <select name="txtSd" id="txtSd" class="form-control">
                         <option value="">-- DD --</option>
+                        <?php 
+                        for ($i=1; $i <= 31; $i++) { 
+                            $j = $i;
+                            if($i < 10){ $j = '0'.$i; }
+                            ?>
+                            <option value="<?php echo $j;?>"><?php echo $j;?></option>
+                            <?php
+                        }
+                        ?>
                     </select>
                 </div>
                 <div class="form-group mb-0 col-4">
-                    <select name="" id="" class="form-control">
+                    <select name="txtSm" id="txtSm" class="form-control">
                         <option value="">-- MM --</option>
+                        <?php 
+                        foreach ($month_sh_th as $key => $value) {
+                            if($key != 0){
+                                ?>
+                                <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                                <?php
+                            }
+                        }
+                        ?>
                     </select>
                 </div>
                 <div class="form-group mb-0 col-4">
-                    <select name="" id="" class="form-control">
+                    <select name="txtSy" id="txtSy" class="form-control">
                         <option value="">-- YYYY --</option>
                         <?php 
                         for ($i=date('Y'); $i <= date('Y') + 1; $i++) { 
@@ -131,12 +149,21 @@
                     <label for="">วันสุดท้ายที่จะ WFH : <span class="text-danger">*</span></label>
                 </div>
                 <div class="form-group mb-0 col-4">
-                    <select name="" id="" class="form-control">
+                    <select name="txtEd" id="txtEd" class="form-control">
                         <option value="">-- DD --</option>
+                        <?php 
+                        for ($i=1; $i <= 31; $i++) { 
+                            $j = $i;
+                            if($i < 10){ $j = '0'.$i; }
+                            ?>
+                            <option value="<?php echo $j;?>"><?php echo $j;?></option>
+                            <?php
+                        }
+                        ?>
                     </select>
                 </div>
                 <div class="form-group mb-0 col-4">
-                    <select name="" id="" class="form-control">
+                    <select name="txtEm" id="txtEm" class="form-control">
                         <option value="">-- MM --</option>
                         <?php 
                         foreach ($month_sh_th as $key => $value) {
@@ -150,7 +177,7 @@
                     </select>
                 </div>
                 <div class="form-group mb-0 col-4">
-                    <select name="" id="" class="form-control">
+                    <select name="txtEy" id="txtEy" class="form-control">
                         <option value="">-- YYYY --</option>
                         <?php 
                         for ($i=date('Y'); $i <= date('Y') + 1; $i++) { 

@@ -32,10 +32,8 @@ if(($category != '') && ($atk != '')){
 <!DOCTYPE html>
 <html class="loading" lang="en" data-textdirection="ltr">
 <!-- BEGIN: Head-->
-<input type="hidden-" id="txtUid" value="<?php echo $uid; ?>" class="form-control">
-<input type="hidden-" id="txtRole" value="<?php echo $resUser['ROLE']; ?>" class="form-control">
-<?php 
-die(); ?>
+<input type="hidden" id="txtUid" value="<?php echo $uid; ?>" class="form-control">
+<input type="hidden" id="txtRole" value="<?php echo $role; ?>" class="form-control">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -211,7 +209,7 @@ die(); ?>
                                                         </label>
                                                     </div>
                                                 </div>
-                                                <div class="col-10 col pl-2 pl-sm-0"><span>มีอาการป่วย / ไม่สบาย โดยเฉพาะโรคทางเดินหายใจ></span></div>
+                                                <div class="col-10 col pl-2 pl-sm-0"><span>มีอาการป่วย / ไม่สบาย โดยเฉพาะโรคทางเดินหายใจ</span></div>
                                             </div>
 
                                             <div>

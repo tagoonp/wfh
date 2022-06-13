@@ -38,7 +38,8 @@ if($stage == 'record_screening'){
         (!isset($_REQUEST['wfh'])) ||
         (!isset($_REQUEST['leave'])) ||
         (!isset($_REQUEST['dmmht'])) ||
-        (!isset($_REQUEST['numdate']))
+        (!isset($_REQUEST['sdate'])) ||
+        (!isset($_REQUEST['edate']))
         ){
         $return['status'] = 'Fail';
         $return['error_message'] = 'Error x1001';
@@ -63,9 +64,12 @@ if($stage == 'record_screening'){
     $wfh = mysqli_real_escape_string($conn, $_POST['wfh']);
     $leave = mysqli_real_escape_string($conn, $_POST['leave']);
     $dmmht = mysqli_real_escape_string($conn, $_POST['dmmht']);
-    $numdate = mysqli_real_escape_string($conn, $_POST['numdate']);
+    // $numdate = mysqli_real_escape_string($conn, $_POST['numdate']);
+    $sdate = mysqli_real_escape_string($conn, $_POST['sdate']);
+    $edate = mysqli_real_escape_string($conn, $_POST['edate']);
+    $sgroup = mysqli_real_escape_string($conn, $_POST['sgroup']);
 
-    $strSQL = "SELECT * FROM wfh_screening WHERE ws_uid = '' AND ws_approve_stage = 'waitreview' AND ws_delete = '0'";
+    $strSQL = "SELECT * FROM wfh_screening WHERE ws_uid = '$uid' AND ws_approve_stage = 'waitreview' AND ws_delete = '0'";
     $res = $db->fetch($strSQL, false, false);
     if($res){
         $return['status'] = 'Fail';
@@ -74,6 +78,17 @@ if($stage == 'record_screening'){
         $db->close();
         die();
     }
+
+    $g = 'na';
+    $sg = 'na';
+
+    if($sgroup == '1_1'){ $g = '1'; $sg = '1'; }
+    if($sgroup == '1_2'){ $g = '1'; $sg = '2'; }
+
+    $earlier = new DateTime($sdate);
+    $later = new DateTime($edate);
+
+    $numdate = $later->diff($earlier)->format("%a"); //3
 
     $strSQL = "INSERT INTO wfh_screening 
                (
@@ -84,13 +99,26 @@ if($stage == 'record_screening'){
                )
                VALUES 
                (
-                    '', '', '$fever', '$cough', '$snot', 
-                    '$headache', '$bodypain', '$atk', '$atkreport', $headreport'', 
+                    '$g', '$sg', '$fever', '$cough', '$snot', 
+                    '$headache', '$bodypain', '$atk', '$atkreport', '$headreport', 
                     '$cireport', '$sonkhlacare', '$wfh', '$leave', '$dmmht', 
-                    '$numdate', '', '', '$datetime', '$uid'
+                    '$numdate', '$sdate', '$edate', '$datetime', '$uid'
                )";
     $resInsert = $db->insert($strSQL, true);
     if($resInsert){
+        for ($i=0; $i < $numdate; $i++) { 
+
+            $recdate = $sdate;
+
+            $strSQL = "INSERT INTO wfh_workplan (`plan_uid`, `plan_date`, `plan_status`, `plan_createdatetime`, `plan_udatetime`)
+                       VALUES ('$uid', '$recdate', 'dummy', '$datetime', '$datetime')
+                      ";
+            $resInsertRecord = $db->insert($strSQL, false);
+            if(!$resInsertRecord){
+                echo $strSQL;
+            }
+            $sdate = date('Y-m-d', strtotime($sdate .' +1 day'));
+        }
         $return['status'] = 'Success';
         $return['record_id'] = $resInsert;
     }else{

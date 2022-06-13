@@ -6,17 +6,34 @@ require('../../../config/database.php');
 $db = new Database();
 $conn = $db->conn();
 
-require('../../../config/admin.php'); 
+require('../../../config/common.php'); 
 require('../../../config/user.php'); 
 
 $page = 'home';
+
+$category = '';
+$atk = '';
+
+if((isset($_GET['category'])) && ($_GET['category'] != '')){
+    $category = mysqli_real_escape_string($conn, $_REQUEST['category']);
+}
+
+if((isset($_GET['atk'])) && ($_GET['atk'] != '')){
+    $atk = mysqli_real_escape_string($conn, $_REQUEST['atk']);
+}
+
+$filter = 0;
+if(($category != '') && ($atk != '')){
+    $filter = 1;
+}
+
 ?>
 
 <!DOCTYPE html>
 <html class="loading" lang="en" data-textdirection="ltr">
 <!-- BEGIN: Head-->
 <input type="hidden" id="txtUid" value="<?php echo $uid; ?>" class="form-control">
-<input type="hidden" id="txtRole" value="<?php echo $resUser['ROLE']; ?>" class="form-control">
+<input type="hidden" id="txtRole" value="<?php echo $role; ?>" class="form-control">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -38,6 +55,7 @@ $page = 'home';
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap-extended.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/colors.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/components.css">
+    <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/preload.js/dist/css/preload.css">
     <!-- END: Theme CSS-->
 
     <!-- BEGIN: Page CSS-->
@@ -46,7 +64,7 @@ $page = 'home';
     <!-- END: Page CSS-->
 
     <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="../../../assets/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../../../assets/css/style.css?v=<?php echo filemtime('../../../assets/css/style.css'); ?>">
     <!-- END: Custom CSS-->
 
 </head>
@@ -114,7 +132,7 @@ $page = 'home';
             <div class="content-header row">
                 <div class="content-header-left col-12 mb-2 mt-1">
                     <div class="breadcrumbs-top">
-                        <h5 class="content-header-title float-left pr-1 mb-0 text-dark">สร้างแผนของคุณ</h5>
+                        <h5 class="content-header-title float-left pr-1 mb-0 text-dark">แบบประเมินความเสี่ยง</h5>
                         <div class="breadcrumb-wrapper d-none d-sm-block">
                             <ol class="breadcrumb p-0 mb-0 pl-1">
                                 <li class="breadcrumb-item active"><a href="index.php"><i class="bx bx-home-alt"></i></a></li>
@@ -124,94 +142,57 @@ $page = 'home';
                 </div>
             </div>
             <div class="content-body">
-                <div class="card">
-                    <!-- <div class="card-header bg-danger">
-                        <H3 class="text-white mb-0">ส่วนที่ 1 : ข้อมูลด้านสุขภาพ อาการ และการสัมผัสกลุ่มเสี่ยง</H3>
-                    </div> -->
-                    <div class="card-body pt-2 text-dark">
-                        <div class="row">
-                            <div class="col-4">
-                                <div style="border: solid; border-width: 0px 1px 0px 0px; border-color: #ccc; padding-right: 20px;">
-                                    <ul class="timeline" style="height: 415px;">
-                                        <li class="timeline-item timeline-icon-danger">
-                                            <h6 class="timeline-title text-dark">1) กลุ่มประวัติ/อาการ/การสัมผัส</h6>
-                                            <div class="timeline-content text-muted">
-                                                Story behind video game and lame is very creative
-                                            </div>
-                                        </li>
-                                        <li class="timeline-item- timeline-icon-secondary">
-                                            <h6 class="timeline-title text-dark">2) ข้อบ่งชี้ทางสุขภาพ</h6>
-                                            <div class="timeline-content text-muted th">
-                                                ข้อบ่งชี้ทางสุขภาพของระบบเดินหายใจ
-                                            </div>
-                                        </li>
-                                        <li class="timeline-item timeline-icon-secondary">
-                                            <h6 class="timeline-title text-dark">3) ผลการตรวจ ATK</h6>
-                                            <div class="timeline-content text-muted th">
-                                                ข้อบ่งชี้ทางสุขภาพของระบบเดินหายใจ
-                                            </div>
-                                        </li>
-                                        
-                                    </ul>
+                <?php 
+                $strSQL = "SELECT * FROM wfh_workplan WHERE plan_uid = '$uid' AND plan_delete = 'N'";
+                $res = $db->fetch($strSQL, true, false);
+                if(($res) && ($res['status'])){
+                    foreach ($res['data'] as $row) {
+                        ?>
+                        <div class="card">
+                            <div class="card-header bg-secondary"><h5 class="text-white mb-0">แผนประจำวันที่ <?php echo $row['plan_date']; ?></h5></div>
+                            <div class="card-body pt-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        แผนการปฏิบัติงาน : <span class="text-danger">*</span>
+                                    </div>
+                                    <div class="col-12">
+                                        <?php 
+                                        if($row['plan_info'] == null){
+                                            echo "-";
+                                        }else{
+                                            echo $row['plan_info'];
+                                        }
+                                        ?>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-8">
-                            <p class="text-danger">** กรุณาตอบข้ตำถามต่อไปนี้เพื่อเป็นข้อมูลการพิจารณาการปฏิบัติงานที่บ้าน</p>
-                        <div class="form-group">
-                            <label for="" class="text-dark mb-2" style="font-size: 1.1em;">1. มีอาการไม่สบายดังต่อไปนี้หรือไม่ <span class="text-danger">*</span></label>
-                            <div>
-                                <div class="custom-control custom-switch custom-control-inline mb-1">
-                                    <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                    <label class="custom-control-label mr-1" for="customSwitch1">
-                                    </label>
-                                    <span>มีอาการเจ็บคอ</span>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="custom-control custom-switch custom-control-inline mb-1">
-                                    <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                    <label class="custom-control-label mr-1" for="customSwitch1">
-                                    </label>
-                                    <span>มีน้ำมูก</span>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="custom-control custom-switch custom-control-inline mb-1">
-                                    <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                    <label class="custom-control-label mr-1" for="customSwitch1">
-                                    </label>
-                                    <span>ปวดหัว</span>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="custom-control custom-switch custom-control-inline mb-1">
-                                    <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                    <label class="custom-control-label mr-1" for="customSwitch1">
-                                    </label>
-                                    <span>ปวดเมื่อยตามตัว</span>
+                                <div class="row">
+                                    <div class="col-12 pt-2">
+                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalCreatePlan" onclick="setPlanId('<?php echo $row['plan_id']; ?>')">เขียนแผน</button>
+                                        <button class="btn btn-danger btn-sm">ลบ</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
+                        <?php
+                    }
+                }
+                ?>
             </div>
         </div>
     </div>
     <!-- END: Content-->
 
-    <div class="modal fade" id="modalRemark" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal fade" id="modalCreatePlan" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-danger">
-                    <h5 class="modal-title text-white th" id="exampleModalCenterTitle" style="font-family: 'Noto Sans Thai', sans-serif !important;">คำชี้แจง</h5>
+                    <h5 class="modal-title text-white th" id="exampleModalCenterTitle" style="font-family: 'Noto Sans Thai', sans-serif !important;">เขียนแผน</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <i class="bx bx-x"></i>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="txtPlanId">
                     <p class="mb-0 text-dark">
                         เพื่อให้เป็นไปตามนโยบายการปฎิบัติตัวก่อนการปฏิบัติงานที่บ้าน (Work From Home) ของสาขาวิชาระบาดวิทยา คณะแพทยศาสตร์ มหาวิทยาลัยสงขลานครินทร์ ท่านจะต้องเป็น/มี/ปรากฏอยู่ในกลุ่มใดกลุ่มหนึ่งตังต่อไปนี้
                         <ol class="text-dark">
@@ -220,14 +201,6 @@ $page = 'home';
                             <li>กลุ่มผู้ที่ไม่มีอาการ และติดต่อกับคนที่มีผลเป็น Positive และ ผลตรวจ ATK เป็น Positive</li>
                         </ol>
                     </p>
-                    <div class="form-group">
-                        <label for="" class="text-dark">ท่านได้อ่านข้อมูลข้างต้นและยืนยันว่าตนเองอยู่ในกลุ่มใดกลุ่มหนึ่งแล้วใช่หรือไม่ <span class="text-danger">*</span></label>
-                        <select name="txtC1" id="txtC1" class="form-control">
-                            <option value="" selected>-- เลือก --</option>
-                            <option value="1">อ่านแล้ว และ อยู่ในกลุ่มข้างต้น</option>
-                            <option value="0">อ่านแล้ว แต่ไม่อยู่ในกลุ่มข้างต้น</option>
-                        </select>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light-secondary" data-dismiss="modal">
@@ -236,7 +209,7 @@ $page = 'home';
                     </button>
                     <button type="button" class="btn btn-danger ml-1" onclick="gonext()">
                         <i class="bx bx-check d-block d-sm-none"></i>
-                        <span class="d-none d-sm-block">ดำเนินการต่อ</span>
+                        <span class="d-none d-sm-block">บันทึก</span>
                     </button>
                 </div>
             </div>
@@ -267,6 +240,8 @@ $page = 'home';
     <script src="../../../app-assets/js/core/app.js"></script>
     <script src="../../../app-assets/js/scripts/components.js"></script>
     <script src="../../../app-assets/js/scripts/footer.js"></script>
+    <script src="../../../app-assets/vendors/js/extensions/sweetalert2.all.min.js"></script>
+    <script src="../../../app-assets/vendors/preload.js/dist/js/preload.js"></script>
     <!-- END: Theme JS-->
 
     <!-- BEGIN: Page JS-->
@@ -275,10 +250,84 @@ $page = 'home';
 
     <script src="../../../assets/js/core.js?v=<?php echo filemtime('../../../assets/js/core.js'); ?>"></script>
     <script src="../../../assets/js/authen.js?v=<?php echo filemtime('../../../assets/js/authen.js'); ?>"></script>
+    <script src="../../../assets/js/wfh.js?v=<?php echo filemtime('../../../assets/js/wfh.js'); ?>"></script>
 
     <script>
-        function gonext(){
-            window.location = 'app-plan-create'
+
+        preload.hide()
+
+        $(function(){
+
+            $('#radioCat1').click(function(){
+                // $check = $("input[name='radioCheck1']:checked").val()
+                // if($check == 1){
+                //     $('#symptom1').removeClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }else{
+                //     $('#symptom1').addClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }
+                $('#radioAtk0').trigger('click')
+            })
+
+            $('#radioCat2').click(function(){
+                // $check = $("input[name='radioCheck1']:checked").val()
+                // if($check == 1){
+                //     $('#symptom1').removeClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }else{
+                //     $('#symptom1').addClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }
+                $('#radioAtk1').trigger('click')
+            })
+
+            $('#radioCat3').click(function(){
+                // $check = $("input[name='radioCheck1']:checked").val()
+                // if($check == 1){
+                //     $('#symptom1').removeClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }else{
+                //     $('#symptom1').addClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }
+                $('#radioAtk1').trigger('click')
+            })
+
+            $('#radioCat4').click(function(){
+                // $check = $("input[name='radioCheck1']:checked").val()
+                // if($check == 1){
+                //     $('#symptom1').removeClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }else{
+                //     $('#symptom1').addClass('dn')
+                //     $('#atkPanal').removeClass('dn')
+                // }
+                $('#radioAtk2').trigger('click')
+            })
+        })
+
+        function setPlanId(pid){
+            $('#txtPlanId').val(pid)
+        }
+
+        function btnNext(){
+            $cat = $("input[name='radioCat']:checked").val()
+            $atk = $("input[name='radioAtk']:checked").val()
+
+            if(($cat == 'na') || ($atk == 'na')){
+                console.log('asd');
+                Swal.fire({
+                    icon: "error",
+                    title: 'คำเตือน',
+                    text: "กรุณากรอกข้อมูลให้ครบถ้วน",
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonClass: 'btn btn-danger',
+                })
+                return ;
+            }
+            
+            window.location = './app-assesment-create?category=' + $cat + '&atk=' + $atk
         }
     </script>
 
